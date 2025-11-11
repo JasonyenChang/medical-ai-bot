@@ -3,7 +3,7 @@
     <h1 class="text-2xl font-bold mb-6 text-gray-800">家庭醫師</h1>
 
     <input type="text" placeholder="輸入你的疑難雜症"
-      class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      class="w-3/4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400"
       v-model="inputQuestion" />
 
     <button @click="askDoctor"
@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { askDoctorQuestion, askDoctorQuestionStream } from "./api";
+import { askDoctorQuestionStream } from "./api";
 
 const loading = ref(false);
 

@@ -17,19 +17,10 @@ class ChatStreamAPIView(APIView):
         
         try:
             generate = ask_medical_bot_sse(question)
-
-            def stream_response():
-                for chunk in generate():
-                    yield chunk
-                    sys.stdout.flush()       # ✅ 強制立即輸出
-                    time.sleep(0.01)         # ✅ 給 Django 緩衝機會釋放
-                yield "[END]"
-
             response = StreamingHttpResponse(
-                stream_response(),
+                generate(),
                 content_type="text/plain; charset=utf-8"
             )
-            response['Cache-Control'] = 'no-cache'
             return response
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
