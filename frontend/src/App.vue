@@ -10,7 +10,7 @@
       class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition cursor-pointer ml-2">
       問醫生
     </button>
-    <div v-if="!loading && doctorAnswer.length > 0" class="py-4">
+    <div class="py-4">
       {{ doctorAnswer }}
     </div>
 
@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { askDoctorQuestion } from "./api";
+import { askDoctorQuestion, askDoctorQuestionStream } from "./api";
 
 const loading = ref(false);
 
@@ -29,13 +29,19 @@ const doctorAnswer = ref<string>("");
 const inputQuestion = ref("");
 
 async function askDoctor() {
+  if (!inputQuestion.value.trim()) return;
+
   loading.value = true;
+  doctorAnswer.value = "";
+
   try {
-    doctorAnswer.value = await askDoctorQuestion(inputQuestion.value);
+    await askDoctorQuestionStream(inputQuestion.value, async (chunk) => {
+      loading.value = false;
+      doctorAnswer.value += chunk; // ✅ 每段即時追加
+    });
   } catch (error) {
     console.error("API error:", error);
   } finally {
-    loading.value = false;
     inputQuestion.value = "";
   }
 }

@@ -21,3 +21,35 @@ export async function askDoctorQuestion(question: string) {
     );
     return data.answer;
 }
+
+export async function askDoctorQuestionStream(
+    question: string,
+    onChunk?: (text: string) => void
+): Promise<string> {
+    const response = await fetch(`${api.defaults.baseURL}/api/chat/stream/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question }),
+    });
+
+    if (!response.ok || !response.body) {
+        throw new Error("Network or server error.");
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let result = "";
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        if (chunk.includes("[END]")) break;
+
+        result += chunk;
+        if (onChunk) onChunk(chunk); // ✅ 即時回傳
+    }
+
+    return result;
+}
