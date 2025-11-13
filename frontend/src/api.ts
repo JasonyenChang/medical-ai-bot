@@ -26,7 +26,7 @@ export async function askDoctorQuestionStream(
     question: string,
     onChunk?: (text: string) => void
 ): Promise<string> {
-    const response = await fetch(`${api.defaults.baseURL}/api/chat/stream/`, {
+    const response = await fetch(`${api.defaults.baseURL}/api/chat/rag/stream/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question }),

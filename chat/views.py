@@ -5,7 +5,26 @@ from django.http import JsonResponse, StreamingHttpResponse
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from .langchain_service import ask_medical_bot, ask_medical_bot_sse
-import sys, time
+from .langchain_rag_service import rag_generate_stream
+
+class ChatRAGStreamAPIView(APIView):
+    parser_classes = [JSONParser]
+
+    def post(self, request):
+        question = request.data.get('question')
+        if not question:
+            return Response("Missing question", status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            generate = rag_generate_stream(question)
+            response = StreamingHttpResponse(
+                generate(),
+                content_type="text/plain; charset=utf-8"
+            )
+            return response
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class ChatStreamAPIView(APIView):
     parser_classes = [JSONParser]
